@@ -3,6 +3,7 @@ import { TerminalInstance } from "./terminal-data";
 
 const Terminal = () => {
   const terminal = new TerminalInstance();
+
   type TerminalUI = {
     lines: String;
     input: String;

@@ -96,6 +96,54 @@ const helpCommand: TerminalCommand = {
   },
 };
 
+const clearCommand: TerminalCommand = {
+  command: "clear",
+  name: "Clear Terminal",
+  description:
+    "== Clear Terminal ==\n" +
+    "Clear the current line buffer.\n" +
+    "Usage:\n" +
+    "  $ clear",
+  execute(terminal, params) {
+    terminal.lines = "";
+    return Promise.resolve();
+  },
+};
+
+const pwdCommand: TerminalCommand = {
+  command: "pwd",
+  name: "Print Working Directory",
+  description:
+    "== Print Working Directory ==\n" +
+    "Prints the terminal's current directory to the screen.\n" +
+    "Usage:\n" +
+    "  $ pwd",
+  execute(terminal, params) {
+    terminal.log(terminal.getDirectoryPath());
+    return Promise.resolve();
+  },
+};
+
+const lsCommand: TerminalCommand = {
+  command: "ls",
+  name: "List Directory Contents",
+  description:
+    "== List Directory Contents ==\n" +
+    "Prints out the contents of the current directory to the screen.\n" +
+    "You may either supply a path, or default to the current path (.)\n" +
+    "Usage:\n" +
+    "  $ ls [<path-to-directory>]",
+  execute(terminal, params) {
+    if (params.length > 0) {
+      terminal.log("[WARN] ls parameters unimplemented.");
+    }
+    for (const item of terminal.workingDirectory.children) {
+      terminal.log(item.name);
+    }
+    return Promise.resolve();
+  },
+};
+
 type RawTerminalFile<DataType> = {
   name: String;
   data: DataType;
@@ -132,7 +180,9 @@ class TerminalInstance {
       } satisfies TerminalDirectory,
     ];
     this.commands = new Map(
-      [cdCommand, helpCommand].map((cmd) => [cmd.command, cmd])
+      [cdCommand, helpCommand, clearCommand, pwdCommand, lsCommand].map(
+        (cmd) => [cmd.command, cmd]
+      )
     );
     this.workingDirectory = this.root;
     this.history = [];
@@ -206,7 +256,7 @@ class TerminalInstance {
 
       const command = this.commands.get(commandName);
       if (command == null) {
-        this.log("Couldn't find command.");
+        this.log(`Couldn't find command "${commandName}".`);
         return;
       }
 
@@ -215,6 +265,16 @@ class TerminalInstance {
     } catch (err) {
       this.log(err as String);
     }
+  }
+
+  getDirectoryPath(dir: TerminalDirectory = this.workingDirectory): String {
+    let result = "";
+    let current: TerminalDirectory | null = dir;
+    while (current != null) {
+      result = current.name + "/" + result;
+      current = current.parent;
+    }
+    return result;
   }
 
   log(text: String = "") {
