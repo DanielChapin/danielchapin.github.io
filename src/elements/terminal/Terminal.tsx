@@ -5,18 +5,25 @@ const Terminal = () => {
   const terminal = new TerminalInstance();
 
   type TerminalUI = {
+    acceptInput: boolean;
     lines: String;
     input: String;
   };
   const [ui, setUI] = useState<TerminalUI>({
+    acceptInput: true,
     input: "",
     lines: terminal.lines,
   });
 
   async function keyUp(event: KeyboardEvent) {
+    if (!ui.acceptInput) {
+      return;
+    }
+
+    setUI({ ...ui, acceptInput: false });
     const input = await terminal.keyboardInput(event);
     const lines = terminal.lines;
-    setUI({ ...ui, input: input, lines: lines });
+    setUI({ ...ui, input: input, lines: lines, acceptInput: true });
   }
 
   useEffect(() => {
@@ -24,12 +31,12 @@ const Terminal = () => {
   }, []);
 
   return (
-    <div className="flex flex-col text-lg font-mono w-full h-full bg-black text-green-500">
-      <p className="whitespace-pre overflow-y-clip">{ui.lines}</p>
-      <div className="flex flex-row">
-        <p className="whitespace-pre">{`$ ${ui.input}`}</p>
-        <p className="animate-blink">█</p>
-      </div>
+    <div className="flex flex-col text-lg font-mono whitespace-pre-wrap break-words w-full h-full bg-black text-green-500">
+      <p className="overflow-y-auto flex flex-col-reverse">{ui.lines}</p>
+      <p>
+        {`$ ${ui.input}`}
+        {ui.acceptInput && <span className="animate-blink">█</span>}
+      </p>
     </div>
   );
 };

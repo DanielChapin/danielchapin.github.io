@@ -13,6 +13,7 @@ class TerminalInstance {
   commands: Map<String, TerminalCommand>;
   workingDirectory: TerminalDirectory;
   history: Array<String>;
+  // TODO Add stylizing for lines
   lines: String;
   input: String;
 
