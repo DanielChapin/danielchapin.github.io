@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TerminalInstance } from "./terminal-data";
+import TerminalInstance from "./terminal-instance";
 
 const Terminal = () => {
   const terminal = new TerminalInstance();
