@@ -1,12 +1,9 @@
-import {
-  cdCommand,
-  helpCommand,
-  clearCommand,
-  pwdCommand,
-  lsCommand,
-  TerminalCommand,
-} from "./terminal-commands";
+import terminalCommands, { TerminalCommand } from "./terminal-commands";
 import { TerminalDirectory } from "./terminal-files";
+
+type TerminalSettings = {
+  onExit?: (terminal: TerminalInstance) => void;
+};
 
 class TerminalInstance {
   root: TerminalDirectory;
@@ -16,8 +13,10 @@ class TerminalInstance {
   // TODO Add stylizing for lines
   lines: String;
   input: String;
+  settings: TerminalSettings;
 
-  constructor() {
+  constructor(settings: TerminalSettings = {}) {
+    this.settings = settings;
     this.root = {
       name: "",
       parent: null,
@@ -30,11 +29,7 @@ class TerminalInstance {
         children: [],
       } satisfies TerminalDirectory,
     ];
-    this.commands = new Map(
-      [cdCommand, helpCommand, clearCommand, pwdCommand, lsCommand].map(
-        (cmd) => [cmd.command, cmd]
-      )
-    );
+    this.commands = new Map(terminalCommands.map((cmd) => [cmd.command, cmd]));
     this.workingDirectory = this.root;
     this.history = [];
     this.lines =

@@ -156,5 +156,41 @@ const lsCommand: TerminalCommand = {
   },
 };
 
+const exitCommand: TerminalCommand = {
+  command: "exit",
+  name: "Exit",
+  description:
+    "== Exit ==\n" +
+    "Terminates the current terminal session.\n" +
+    "Usage:\n" +
+    "  $ exit",
+  execute(terminal, params) {
+    const onExit = terminal.settings.onExit;
+    if (onExit != null) {
+      onExit(terminal);
+      return Promise.resolve("Goodbye.");
+    } else {
+      return Promise.reject("No onExit function provided.");
+    }
+  },
+};
+
+const terminalCommands: Array<TerminalCommand> = [
+  cdCommand,
+  helpCommand,
+  clearCommand,
+  pwdCommand,
+  lsCommand,
+  exitCommand,
+];
+
+export default terminalCommands;
 export type { TerminalCommand };
-export { cdCommand, clearCommand, helpCommand, pwdCommand, lsCommand };
+export {
+  cdCommand,
+  clearCommand,
+  helpCommand,
+  pwdCommand,
+  lsCommand,
+  exitCommand,
+};

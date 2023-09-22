@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import TerminalInstance from "@models/terminal/terminal-instance";
 
 const Terminal = () => {
-  const terminal = new TerminalInstance();
+  const navigate = useNavigate();
+
+  const terminal = new TerminalInstance({
+    onExit: () => navigate("/"),
+  });
 
   type TerminalUI = {
     acceptInput: boolean;

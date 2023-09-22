@@ -4,6 +4,7 @@ import TestPage from "./pages/TestPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import TerminalPage from "./pages/TerminalPage";
 
+// TODO Update to use HashRouter (to permit page refreshes on gh-pages deployment)
 const router = createBrowserRouter([
   {
     path: "/",
