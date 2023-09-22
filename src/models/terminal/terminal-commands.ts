@@ -70,7 +70,7 @@ const cdCommand: TerminalCommand = {
       }
     }
 
-    terminal.workingDirectory = directory;
+    terminal.setWorkingDirectory(directory);
 
     return Promise.resolve();
   },

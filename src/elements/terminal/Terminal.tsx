@@ -13,13 +13,13 @@ const Terminal = () => {
     acceptInput: boolean;
     lines: String;
     input: String;
-    directory: String;
+    prompt: String;
   };
   const [ui, setUI] = useState<TerminalUI>({
     acceptInput: true,
-    input: "",
+    input: terminal.input,
     lines: terminal.lines,
-    directory: terminal.getDirectoryPath(),
+    prompt: terminal.prompt,
   });
 
   async function keyUp(event: KeyboardEvent) {
@@ -35,7 +35,7 @@ const Terminal = () => {
       input: input,
       lines: lines,
       acceptInput: true,
-      directory: terminal.getDirectoryPath(),
+      prompt: terminal.prompt,
     });
   }
 
@@ -47,7 +47,7 @@ const Terminal = () => {
     <div className="flex flex-col text-lg font-mono whitespace-pre-wrap break-words w-full h-full bg-black text-green-500">
       <p className="overflow-y-auto flex flex-col-reverse">{ui.lines}</p>
       <p>
-        {`${ui.directory} $ ${ui.input}`}
+        {`${ui.prompt}${ui.input}`}
         {ui.acceptInput && <span className="animate-blink">█</span>}
       </p>
     </div>

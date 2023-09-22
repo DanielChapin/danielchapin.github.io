@@ -12,6 +12,7 @@ class TerminalInstance {
   history: Array<String>;
   // TODO Add stylizing for lines
   lines: String;
+  prompt: String;
   input: String;
   settings: TerminalSettings;
 
@@ -31,12 +32,20 @@ class TerminalInstance {
     ];
     this.commands = new Map(terminalCommands.map((cmd) => [cmd.command, cmd]));
     this.workingDirectory = this.root;
+    this.prompt = "$";
     this.history = [];
     this.lines =
       "Daniel Chapin Portfolio Terminal\n" +
       "(Type 'help')\n" +
       "(If keystokes aren't registering you may need to click on the page.)\n";
     this.input = "";
+
+    this.setWorkingDirectory(this.root);
+  }
+
+  setWorkingDirectory(directory: TerminalDirectory) {
+    this.workingDirectory = directory;
+    this.prompt = `${this.getDirectoryPath()} $ `;
   }
 
   parseTokens(line: String): Promise<Array<String>> {
@@ -91,7 +100,7 @@ class TerminalInstance {
 
   async execute(line: String): Promise<void> {
     try {
-      this.log(`$ ${line}`);
+      this.log(`${this.prompt}${line}`);
       const tokens = await this.parseTokens(line);
       if (tokens.length === 0) {
         return;
