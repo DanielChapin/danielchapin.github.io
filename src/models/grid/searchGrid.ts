@@ -55,6 +55,12 @@ class SearchGrid<CellType> extends Grid<CellType> {
     this.end = to;
     return true;
   }
+
+  override getNeighbors([x, y]: Coord2D): Coord2D[] {
+    return super
+      .getNeighbors([x, y])
+      .filter((neighbor) => !this.isBlocking(this, neighbor));
+  }
 }
 
 class BinaryCellSearchGrid extends SearchGrid<BinaryCell> {
@@ -63,8 +69,8 @@ class BinaryCellSearchGrid extends SearchGrid<BinaryCell> {
       width,
       height,
       (grid: SearchGrid<BinaryCell>, [x, y]: Coord2D) =>
-        areCoord2DsEqual(this.start, [x, y]) &&
-        areCoord2DsEqual(this.end, [x, y]) &&
+        !areCoord2DsEqual(this.start, [x, y]) &&
+        !areCoord2DsEqual(this.end, [x, y]) &&
         grid.getCell([x, y]) === BinaryCell.FILLED
     );
   }

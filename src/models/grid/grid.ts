@@ -1,10 +1,34 @@
 import assert from "assert";
-import { Coord2D } from "util/Coord2D";
+import { Coord2D, addCoord2D } from "util/Coord2D";
+
+enum NeighborMode {
+  CARDINALS,
+  SQUARE,
+}
+
+const cardinalNeighbors: Array<Coord2D> = [
+  [1, 0],
+  [-1, 0],
+  [0, 1],
+  [0, -1],
+];
+const diagonalNeighbors: Array<Coord2D> = [
+  [1, 1],
+  [-1, 1],
+  [1, -1],
+  [-1, -1],
+];
+const squareNeighbors: Array<Coord2D> = [
+  ...cardinalNeighbors,
+  ...diagonalNeighbors,
+];
 
 class Grid<CellType> {
   private width: number;
   private height: number;
   private data: Array<Array<CellType>>;
+
+  neighborMode: NeighborMode = NeighborMode.CARDINALS;
 
   constructor(width: number, height: number) {
     this.width = width;
@@ -33,6 +57,22 @@ class Grid<CellType> {
     this.data[y][x] = value;
     return true;
   }
+
+  getNeighbors([x, y]: Coord2D): Array<Coord2D> {
+    let deltas: Array<Coord2D>;
+    switch (this.neighborMode) {
+      case NeighborMode.CARDINALS:
+        deltas = cardinalNeighbors;
+        break;
+      case NeighborMode.SQUARE:
+        deltas = squareNeighbors;
+        break;
+    }
+
+    let neighbors = deltas.map((delta) => addCoord2D(delta, [x, y]));
+    neighbors = neighbors.filter((coord) => this.isInside(coord));
+    return neighbors;
+  }
 }
 
 enum BinaryCell {
@@ -41,4 +81,4 @@ enum BinaryCell {
 }
 
 export default Grid;
-export { BinaryCell };
+export { BinaryCell, NeighborMode };
