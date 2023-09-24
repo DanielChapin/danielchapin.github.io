@@ -1,11 +1,10 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createHashRouter } from "react-router-dom";
 
 import TestPage from "./pages/TestPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import TerminalPage from "./pages/TerminalPage";
 
-// TODO Update to use HashRouter (to permit page refreshes on gh-pages deployment)
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <PortfolioPage />,
