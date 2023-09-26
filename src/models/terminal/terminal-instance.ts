@@ -1,5 +1,9 @@
 import terminalCommands, { TerminalCommand } from "./terminal-commands";
-import { TerminalDirectory } from "./terminal-files";
+import {
+  TerminalDirectory,
+  TerminalExecutableFile,
+  TerminalTextFile,
+} from "./terminal-files";
 
 type TerminalSettings = {
   onExit?: (terminal: TerminalInstance) => void;
@@ -120,6 +124,51 @@ class TerminalInstance {
     } catch (err) {
       this.log(err as String);
     }
+  }
+
+  getDirectory(resourcePath: String): Promise<TerminalDirectory> {
+    const path = resourcePath.split("/");
+    const absolute = path[0] === this.root.name;
+
+    let directory = this.workingDirectory;
+
+    if (absolute) {
+      directory = this.root;
+      path.shift();
+    }
+
+    if (path.length > 0 && path.at(-1) === "") {
+      path.pop();
+    }
+
+    while (path.length > 0) {
+      const next = path[0];
+      path.shift();
+
+      if (next === ".") {
+        continue;
+      } else if (next === "..") {
+        const previous = directory.parent;
+        if (previous == null) {
+          return Promise.reject("Root directory has no parent directory.");
+        }
+        directory = previous;
+      } else {
+        const candidate = directory.children.find((dir) => dir.name === next);
+        if (candidate == null) {
+          return Promise.reject(`Could not find directory "${next}".`);
+        } else if (
+          candidate instanceof TerminalExecutableFile ||
+          candidate instanceof TerminalTextFile
+        ) {
+          return Promise.reject(`'${candidate.name}' is a file.`);
+        } else {
+          directory = candidate as TerminalDirectory;
+        }
+      }
+    }
+
+    return Promise.resolve(directory);
   }
 
   getDirectoryPath(dir: TerminalDirectory = this.workingDirectory): String {

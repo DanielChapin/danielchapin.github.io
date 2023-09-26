@@ -1,8 +1,4 @@
-import {
-  TerminalDirectory,
-  TerminalExecutableFile,
-  TerminalTextFile,
-} from "./terminal-files";
+import { TerminalDirectory } from "./terminal-files";
 import TerminalInstance from "./terminal-instance";
 
 type TerminalCommand = {
@@ -23,56 +19,19 @@ const cdCommand: TerminalCommand = {
     "Used to switch between directories.\n" +
     "Usage:\n" +
     "  $ cd <relative-or-absolute-directory-path>",
-  execute(terminal, params) {
+  async execute(terminal, params) {
     if (params.length !== 1 || params[0] === "") {
       return Promise.reject("Exactly 1 parameter required.");
     }
 
-    // TODO Move directory/file finding to TerminalInstance
-    const path = params[0].split("/");
-    const absolute = path[0] === terminal.root.name;
+    const path = params[0];
 
-    let directory = terminal.workingDirectory;
-
-    if (absolute) {
-      directory = terminal.root;
-      path.shift();
+    try {
+      const directory: TerminalDirectory = await terminal.getDirectory(path);
+      terminal.setWorkingDirectory(directory);
+    } catch (err) {
+      return Promise.reject(err);
     }
-
-    if (path.length > 0 && path.at(-1) === "") {
-      path.pop();
-    }
-
-    while (path.length > 0) {
-      const next = path[0];
-      path.shift();
-
-      if (next === ".") {
-        continue;
-      } else if (next === "..") {
-        const previous = directory.parent;
-        if (previous == null) {
-          return Promise.reject("Root directory has no parent directory.");
-        }
-        directory = previous;
-      } else {
-        const candidate = directory.children.find((dir) => dir.name === next);
-        if (candidate == null) {
-          return Promise.reject(`Could not find directory "${next}".`);
-        } else if (
-          candidate instanceof TerminalExecutableFile ||
-          candidate instanceof TerminalTextFile
-        ) {
-          return Promise.reject(`'${candidate.name}' is a file.`);
-        } else {
-          directory = candidate as TerminalDirectory;
-        }
-      }
-    }
-
-    terminal.setWorkingDirectory(directory);
-
-    return Promise.resolve();
   },
 };
 
