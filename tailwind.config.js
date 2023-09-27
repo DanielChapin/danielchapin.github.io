@@ -14,6 +14,12 @@ module.exports = {
       animation: {
         blink: 'blink 1s linear infinite'
       },
+      width: {
+        'a4': "8.5in",
+      },
+      height: {
+        'a4': "11in"
+      }
     },
   },
   plugins: [],
