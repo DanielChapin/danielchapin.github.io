@@ -7,3 +7,9 @@ export function areCoord2DsEqual(a: Coord2D, b: Coord2D): boolean {
 export function addCoord2D([ax, ay]: Coord2D, [bx, by]: Coord2D): Coord2D {
   return [ax + bx, ay + by];
 }
+
+export function distanceCoord2D([ax, ay]: Coord2D, [bx, by]: Coord2D): number {
+  const dx = ax - bx;
+  const dy = ay - by;
+  return Math.sqrt(dx * dx + dy * dy);
+}

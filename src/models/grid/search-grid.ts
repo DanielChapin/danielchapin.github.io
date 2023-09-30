@@ -1,16 +1,10 @@
 import { Coord2D, areCoord2DsEqual } from "util/Coord2D";
-import Grid, { BinaryCell } from "./grid";
-
-type IsBlockingPredicate<CellType> = (
-  searchGrid: SearchGrid<CellType>,
-  [x, y]: Coord2D
-) => boolean;
+import Grid, { BinaryCell, IsBlockingPredicate } from "./grid";
 
 class SearchGrid<CellType> extends Grid<CellType> {
   protected start: Coord2D;
   protected end: Coord2D;
 
-  isBlocking: IsBlockingPredicate<CellType>;
   restrictStartEndPlacement: boolean = false;
 
   constructor(
@@ -18,7 +12,7 @@ class SearchGrid<CellType> extends Grid<CellType> {
     height: number,
     isBlocking: IsBlockingPredicate<CellType>
   ) {
-    super(width, height);
+    super(width, height, isBlocking);
     this.start = [0, 0];
     this.end = [width - 1, height - 1];
     this.isBlocking = isBlocking;
@@ -68,10 +62,10 @@ class BinaryCellSearchGrid extends SearchGrid<BinaryCell> {
     super(
       width,
       height,
-      (grid: SearchGrid<BinaryCell>, [x, y]: Coord2D) =>
+      (grid: Grid<BinaryCell>, [x, y]: Coord2D) =>
         !areCoord2DsEqual(this.start, [x, y]) &&
         !areCoord2DsEqual(this.end, [x, y]) &&
-        grid.getCell([x, y]) === BinaryCell.FILLED
+        grid.getValue([x, y]) === BinaryCell.FILLED
     );
   }
 }
