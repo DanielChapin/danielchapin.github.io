@@ -13,7 +13,7 @@ enum SolutionState {
 //     step: one subsection of a full search cycle (ie. getting neighbors)
 //     jump: A full cycle of the search loop (ie. getting neighbors, checking if they're searched, adding them to the frontier)
 //   Get the path to any given searched vertex
-//   Get current search status (searching, found path, or no path)
+//   Get current solution status (searching, found path, or no path)
 //   Access to internal status of the algorithm.
 //     ie. frontier and searched for BFS/DFS
 //     frontier, searched, f(n), g(n), h(n) for A*
