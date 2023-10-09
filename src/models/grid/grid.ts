@@ -6,6 +6,7 @@ import {
   addCoord2D,
   distanceCoord2D,
   neighborDeltas,
+  ringDistance,
 } from "util/Coord2D";
 
 type IsBlockingPredicate<CellType> = (
@@ -38,14 +39,7 @@ class Grid<CellType> implements WeightedGraph<Coord2D, CellType> {
   }
 
   adjacent(a: Coord2D, b: Coord2D): boolean {
-    const distx = Math.abs(a[0] - b[0]);
-    const disty = Math.abs(a[1] - b[1]);
-    switch (this.neighborMode) {
-      case NeighborMode.CARDINALS:
-        return distx + disty === 1;
-      case NeighborMode.SQUARE:
-        return distx + disty > 0 && distx <= 1 && disty <= 1;
-    }
+    return ringDistance(a, b) === 1;
   }
 
   getValue(vertex: Coord2D): CellType {

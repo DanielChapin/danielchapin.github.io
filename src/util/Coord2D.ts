@@ -82,3 +82,9 @@ export function generateNeighbors(
 
   return neighbors;
 }
+
+export function ringDistance([ax, ay]: Coord2D, [bx, by]: Coord2D): number {
+  const dx = ax - bx;
+  const dy = ay - by;
+  return Math.max(Math.abs(dx), Math.abs(dy));
+}
