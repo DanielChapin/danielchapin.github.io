@@ -1,33 +1,17 @@
 import { WeightedGraph } from "@models/graph/graph";
 import assert from "assert";
-import { Coord2D, addCoord2D, distanceCoord2D } from "util/Coord2D";
+import {
+  Coord2D,
+  NeighborMode,
+  addCoord2D,
+  distanceCoord2D,
+  neighborDeltas,
+} from "util/Coord2D";
 
 type IsBlockingPredicate<CellType> = (
   searchGrid: Grid<CellType>,
   [x, y]: Coord2D
 ) => boolean;
-
-enum NeighborMode {
-  CARDINALS,
-  SQUARE,
-}
-
-const cardinalNeighbors: Array<Coord2D> = [
-  [1, 0],
-  [-1, 0],
-  [0, 1],
-  [0, -1],
-];
-const diagonalNeighbors: Array<Coord2D> = [
-  [1, 1],
-  [-1, 1],
-  [1, -1],
-  [-1, -1],
-];
-const squareNeighbors: Array<Coord2D> = [
-  ...cardinalNeighbors,
-  ...diagonalNeighbors,
-];
 
 class Grid<CellType> implements WeightedGraph<Coord2D, CellType> {
   private width: number;
@@ -86,17 +70,9 @@ class Grid<CellType> implements WeightedGraph<Coord2D, CellType> {
   }
 
   getNeighbors([x, y]: Coord2D): Array<Coord2D> {
-    let deltas: Array<Coord2D>;
-    switch (this.neighborMode) {
-      case NeighborMode.CARDINALS:
-        deltas = cardinalNeighbors;
-        break;
-      case NeighborMode.SQUARE:
-        deltas = squareNeighbors;
-        break;
-    }
-
-    let neighbors = deltas.map((delta) => addCoord2D(delta, [x, y]));
+    let neighbors = neighborDeltas(this.neighborMode).map((delta) =>
+      addCoord2D(delta, [x, y])
+    );
     neighbors = neighbors.filter((coord) => this.isInside(coord));
     return neighbors;
   }
@@ -108,5 +84,5 @@ enum BinaryCell {
 }
 
 export default Grid;
-export { BinaryCell, NeighborMode };
+export { BinaryCell };
 export type { IsBlockingPredicate };
