@@ -1,12 +1,15 @@
+import defaultFileSystem from "./defaultFileSystem";
 import terminalCommands, { TerminalCommand } from "./terminal-commands";
-import {
+import TerminalFile, {
   TerminalDirectory,
   TerminalExecutableFile,
   TerminalTextFile,
+  isTerminalFile,
 } from "./terminal-files";
 
 type TerminalSettings = {
   onExit?: (terminal: TerminalInstance) => void;
+  redirect?: (terminal: TerminalInstance, path: String) => void;
 };
 
 class TerminalInstance {
@@ -14,7 +17,6 @@ class TerminalInstance {
   commands: Map<String, TerminalCommand>;
   workingDirectory: TerminalDirectory;
   history: Array<String>;
-  // TODO Add stylizing for lines
   lines: String;
   prompt: String;
   input: String;
@@ -22,18 +24,7 @@ class TerminalInstance {
 
   constructor(settings: TerminalSettings = {}) {
     this.settings = settings;
-    this.root = {
-      name: "",
-      parent: null,
-      children: [],
-    };
-    this.root.children = [
-      {
-        name: "test",
-        parent: this.root,
-        children: [],
-      } satisfies TerminalDirectory,
-    ];
+    this.root = defaultFileSystem();
     this.commands = new Map(terminalCommands.map((cmd) => [cmd.command, cmd]));
     this.workingDirectory = this.root;
     this.prompt = "$";
@@ -119,10 +110,19 @@ class TerminalInstance {
         return;
       }
 
-      const result = await command.execute(this, parameters);
-      console.log(result);
+      await command.execute(this, parameters);
     } catch (err) {
       this.log(err as String);
+      return Promise.reject(err);
+    }
+  }
+
+  async executeScript(script: String): Promise<void> {
+    const lines = script.split("\n");
+    for (let line of lines) {
+      try {
+        await this.execute(line);
+      } catch (err) {}
     }
   }
 
@@ -157,10 +157,7 @@ class TerminalInstance {
         const candidate = directory.children.find((dir) => dir.name === next);
         if (candidate == null) {
           return Promise.reject(`Could not find directory "${next}".`);
-        } else if (
-          candidate instanceof TerminalExecutableFile ||
-          candidate instanceof TerminalTextFile
-        ) {
+        } else if (isTerminalFile(candidate)) {
           return Promise.reject(`'${candidate.name}' is a file.`);
         } else {
           directory = candidate as TerminalDirectory;
@@ -169,6 +166,71 @@ class TerminalInstance {
     }
 
     return Promise.resolve(directory);
+  }
+
+  async getFile(resourcePath: String): Promise<TerminalFile<any>> {
+    const match = resourcePath.match(/^([/a-zA-Z_]*\/)?([a-zA-Z_.]*)$/);
+    if (match == null || match.length !== 3) {
+      return Promise.reject("Malformated file path.");
+    }
+
+    const [dirPath, filename] = match.slice(1);
+    let dir = this.workingDirectory;
+    if (dirPath != null) {
+      try {
+        dir = await this.getDirectory(dirPath);
+      } catch (err) {
+        return Promise.reject(err);
+      }
+    }
+
+    const files = dir.children.filter((child) => {
+      return isTerminalFile(child) && child.name === filename;
+    });
+
+    if (files.length === 0) {
+      return Promise.reject(
+        `Could not find file with name '${filename}' in ${this.getDirectoryPath(
+          dir
+        )}`
+      );
+    }
+
+    const file = files[0];
+
+    if (isTerminalFile(file)) {
+      return Promise.resolve(file);
+    }
+
+    return Promise.reject("Could not get file.");
+  }
+
+  async getExecutable(resourcePath: String): Promise<TerminalExecutableFile> {
+    try {
+      const file = await this.getFile(resourcePath);
+
+      if (!(file instanceof TerminalExecutableFile)) {
+        return Promise.reject(`'${resourcePath}' is not an executable.`);
+      }
+
+      return Promise.resolve(file);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
+  async getTextFile(resourcePath: String): Promise<TerminalTextFile> {
+    try {
+      const file = await this.getFile(resourcePath);
+
+      if (!(file instanceof TerminalTextFile)) {
+        return Promise.reject(`'${resourcePath}' is not a text file.`);
+      }
+
+      return Promise.resolve(file);
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 
   getDirectoryPath(dir: TerminalDirectory = this.workingDirectory): String {
@@ -193,7 +255,9 @@ class TerminalInstance {
     } else if (key === "Backspace") {
       this.input = this.input.slice(0, -1);
     } else if (key === "Enter") {
-      await this.execute(this.input);
+      try {
+        await this.execute(this.input);
+      } catch {}
       this.input = "";
     }
 

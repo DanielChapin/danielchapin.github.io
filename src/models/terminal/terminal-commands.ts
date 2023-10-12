@@ -1,4 +1,8 @@
-import { TerminalDirectory } from "./terminal-files";
+import {
+  TerminalDirectory,
+  TerminalExecutableFile,
+  TerminalTextFile,
+} from "./terminal-files";
 import TerminalInstance from "./terminal-instance";
 
 type TerminalCommand = {
@@ -134,6 +138,93 @@ const exitCommand: TerminalCommand = {
   },
 };
 
+const redirectCommand: TerminalCommand = {
+  command: "redirect",
+  name: "Redirect",
+  description:
+    "== Redirect ==\n" +
+    "Redirects to the given path.\n" +
+    "Usage:\n" +
+    "  $ redirect <website-path>\n" +
+    "Example:\n" +
+    "  $ redirect /games/minesweeper",
+  execute(terminal, params) {
+    if (params.length !== 1) {
+      return Promise.reject("1 parameter required. ($ help redirect)");
+    }
+
+    const redirect = terminal.settings.redirect;
+    if (redirect) {
+      redirect(terminal, params[0]);
+      return Promise.resolve("Goodbye.");
+    } else {
+      return Promise.reject("No redirect handler available on page.");
+    }
+  },
+};
+
+const runCommand: TerminalCommand = {
+  command: "run",
+  name: "Run",
+  description:
+    "== Run ==\n" +
+    "Runs a given executable or script file.\n" +
+    "Usage:\n" +
+    "  $ run <file-name-or-path>\n" +
+    "Example:\n" +
+    "  $ run /hello_world.exe 10",
+  async execute(terminal, params) {
+    if (params.length === 0) {
+      return Promise.reject("At least 1 parameter required. ($ help run)");
+    }
+
+    const targetPath = params[0];
+    params.shift();
+
+    try {
+      const file = await terminal.getFile(targetPath);
+      if (file instanceof TerminalExecutableFile) {
+        file.data.execute(terminal, params);
+      } else if (file instanceof TerminalTextFile) {
+        await terminal.executeScript(file.data);
+      }
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  },
+};
+
+const commentCommand: TerminalCommand = {
+  command: "#",
+  name: "Comment",
+  description: "== Comment ==\nDoes nothing... just used for documentation.",
+  async execute(terminal, params) {},
+};
+
+const catCommand: TerminalCommand = {
+  command: "cat",
+  name: "Concatenate File Contents",
+  description:
+    "== Concatenate File Contents ==\n" +
+    "Writes a file's contents to the terminal.\n" +
+    "Usage:\n" +
+    "  $ cat <file-path> [<file-path1>...]",
+  async execute(terminal, params) {
+    if (params.length !== 1) {
+      return Promise.reject("Requires at least 1 argument.");
+    }
+
+    for (let filename of params) {
+      try {
+        const file = await terminal.getTextFile(filename);
+        terminal.log(file.data);
+      } catch (err) {
+        terminal.log(err as String);
+      }
+    }
+  },
+};
+
 const terminalCommands: Array<TerminalCommand> = [
   cdCommand,
   helpCommand,
@@ -141,6 +232,10 @@ const terminalCommands: Array<TerminalCommand> = [
   pwdCommand,
   lsCommand,
   exitCommand,
+  redirectCommand,
+  runCommand,
+  commentCommand,
+  catCommand,
 ];
 
 export default terminalCommands;

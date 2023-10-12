@@ -3,7 +3,7 @@ import { createHashRouter } from "react-router-dom";
 import TestPage from "./pages/TestPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import TerminalPage from "./pages/TerminalPage";
-import MinesweeperPage from "pages/games/Minesweeper";
+import MinesweeperPage from "pages/games/MinesweeperPage";
 
 const router = createHashRouter([
   {

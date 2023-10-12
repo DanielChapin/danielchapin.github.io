@@ -7,6 +7,7 @@ const Terminal = () => {
 
   const terminal = new TerminalInstance({
     onExit: () => navigate("/"),
+    redirect: (_terminal, path) => navigate(path.toString()),
   });
 
   type TerminalUI = {

@@ -3,7 +3,9 @@ import MinesweeperElement from "elements/games/minesweeper/Minesweeper";
 const MinesweeperPage = () => {
   return (
     <div>
-      Minesweeper
+      <p className="text-2xl">
+        Minesweeper <small>(WIP)</small>
+      </p>
       <MinesweeperElement />
     </div>
   );
