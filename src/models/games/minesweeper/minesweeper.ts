@@ -14,7 +14,15 @@ type Tile = {
   adjacentBombs: number;
   bomb: boolean;
   selectionState: SelectionType | null;
+  incorrect: boolean;
 };
+
+const emptyTile: () => Tile = () => ({
+  adjacentBombs: 0,
+  bomb: false,
+  selectionState: null,
+  incorrect: false,
+});
 
 type MinesweeperSettings = {
   width: number;
@@ -106,6 +114,7 @@ class Minesweeper {
 
     if (tile.bomb) {
       this.gameOver = true;
+      tile.incorrect = true;
       return;
     }
 
@@ -121,8 +130,10 @@ class Minesweeper {
 
     if (tile.selectionState == null) {
       tile.selectionState = SelectionType.Flagged;
+      tile.incorrect = !tile.bomb;
     } else if (tile.selectionState === SelectionType.Flagged) {
       tile.selectionState = null;
+      tile.incorrect = false;
     }
   }
 
@@ -130,16 +141,21 @@ class Minesweeper {
     return this.board[y][x];
   }
 
+  getBoard(): Array<Array<Tile>> {
+    return this.board;
+  }
+
   reset() {
     this.gameOver = false;
     this.shouldGenerateMines = true;
-    this.board = Array<Array<Tile>>(this.height).fill(
-      Array<Tile>(this.width).fill({
-        adjacentBombs: 0,
-        bomb: false,
-        selectionState: null,
-      })
-    );
+    this.board = Array<Array<Tile>>(this.height);
+    for (let y = 0; y < this.height; y++) {
+      const row = Array<Tile>(this.width);
+      for (let x = 0; x < this.width; x++) {
+        row[x] = emptyTile();
+      }
+      this.board[y] = row;
+    }
   }
 
   selectTile(coord: Coord2D, type: SelectionType) {
@@ -157,5 +173,5 @@ class Minesweeper {
 }
 
 export default Minesweeper;
-export { Difficulty, difficultySettings };
-export type { MinesweeperSettings };
+export { Difficulty, difficultySettings, SelectionType };
+export type { MinesweeperSettings, Tile };
