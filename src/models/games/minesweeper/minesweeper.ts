@@ -16,6 +16,33 @@ type Tile = {
   selectionState: SelectionType | null;
 };
 
+type MinesweeperSettings = {
+  width: number;
+  height: number;
+  mines: number;
+};
+
+enum Difficulty {
+  Easy,
+  Medium,
+  Hard,
+  Custom,
+}
+const difficultySettings: (_: Difficulty) => MinesweeperSettings = (
+  diff: Difficulty
+) => {
+  switch (diff) {
+    case Difficulty.Easy:
+      return { width: 9, height: 9, mines: 10 };
+    case Difficulty.Medium:
+      return { width: 16, height: 16, mines: 40 };
+    case Difficulty.Hard:
+      return { width: 30, height: 16, mines: 99 };
+    default:
+      return { width: 30, height: 20, mines: 145 };
+  }
+};
+
 class Minesweeper {
   width: number;
   height: number;
@@ -25,7 +52,7 @@ class Minesweeper {
   private shouldGenerateMines: boolean = true;
   private static safeDistance = 1;
 
-  constructor(width: number, height: number, mines: number) {
+  constructor({ width, height, mines }: MinesweeperSettings) {
     this.width = width;
     this.height = height;
     this.mines = mines;
@@ -130,3 +157,5 @@ class Minesweeper {
 }
 
 export default Minesweeper;
+export { Difficulty, difficultySettings };
+export type { MinesweeperSettings };
