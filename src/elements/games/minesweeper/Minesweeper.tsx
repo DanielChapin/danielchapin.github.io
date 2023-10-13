@@ -30,13 +30,11 @@ const MinesweeperElement = () => {
 
   const tileClicked = (
     event: React.MouseEvent<HTMLTableCellElement, MouseEvent>,
-    coord: Coord2D
+    coord: Coord2D,
+    selection: SelectionType
   ) => {
     event.preventDefault();
-    if (event.button === 0)
-      settings.instance.selectTile(coord, SelectionType.Cleared);
-    else if (event.button === 2)
-      settings.instance.selectTile(coord, SelectionType.Flagged);
+    settings.instance.selectTile(coord, selection);
     updateSettings();
   };
 
@@ -46,14 +44,19 @@ const MinesweeperElement = () => {
 
   return (
     <div>
-      <div>
+      <div className="flex flex-row">
         <button
+          className="text-4xl"
           onClick={() => {
             settings.instance.reset();
             updateSettings();
           }}
         >
-          Reset
+          {settings.instance.victory
+            ? "😎"
+            : settings.instance.gameOver
+            ? "😭"
+            : "🙂"}
         </button>
         <div>
           Game <small>settings</small>
@@ -71,13 +74,19 @@ const MinesweeperElement = () => {
                   <td
                     key={`${[x, y]}`}
                     className="p-0 w-8 h-8"
-                    onClick={(event) => tileClicked(event, [x, y])}
-                    onContextMenu={(event) => tileClicked(event, [x, y])}
+                    onClick={(event) =>
+                      tileClicked(event, [x, y], SelectionType.Cleared)
+                    }
+                    onContextMenu={(event) =>
+                      tileClicked(event, [x, y], SelectionType.Flagged)
+                    }
                   >
                     <div
                       className={`text-lg m-0 p-0 w-full h-full flex items-center justify-center border ${
                         tile.selectionState === SelectionType.Cleared
-                          ? "bg-gray-300"
+                          ? "bg-gray-200"
+                          : settings.instance.victory
+                          ? "bg-green-500"
                           : "bg-gray-400"
                       } ${
                         settings.instance.gameOver && tile.incorrect
@@ -110,6 +119,9 @@ const MinesweeperElement = () => {
             ))}
           </tbody>
         </table>
+        <p className="min-w-max">
+          {settings.instance.flagCount()}/{settings.instance.mineCount()} Flags
+        </p>
       </div>
     </div>
   );
