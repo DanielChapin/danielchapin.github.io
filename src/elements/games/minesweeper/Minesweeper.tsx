@@ -14,6 +14,8 @@ const MinesweeperElement = () => {
   };
   type UISettings = {
     scale: number;
+    showGameSettings: boolean;
+    showUISettings: boolean;
   };
   type Settings = InstanceSettings & UISettings;
 
@@ -23,10 +25,12 @@ const MinesweeperElement = () => {
       game: diffSettings,
       instance: new Minesweeper(diffSettings),
       scale: 1.0,
+      showGameSettings: false,
+      showUISettings: false,
     };
   });
   const updateSettings = (data: Partial<Settings> = {}) =>
-    setSettings({ ...data, ...settings });
+    setSettings({ ...settings, ...data });
 
   const tileClicked = (
     event: React.MouseEvent<HTMLTableCellElement, MouseEvent>,
@@ -58,14 +62,28 @@ const MinesweeperElement = () => {
             ? "😭"
             : "🙂"}
         </button>
-        <div>
-          Game <small>settings</small>
-        </div>
-        <div>
-          Display <small>settings</small>
-        </div>
+        <button
+          onClick={() =>
+            updateSettings({ showGameSettings: !settings.showGameSettings })
+          }
+        >
+          Game
+        </button>
+        <button
+          onClick={() =>
+            updateSettings({ showUISettings: !settings.showUISettings })
+          }
+        >
+          Display
+        </button>
       </div>
       <div>
+        {(settings.showGameSettings || settings.showUISettings) && (
+          <div className="absolute flex flex-row">
+            {settings.showGameSettings && <div>Game Settings</div>}
+            {settings.showUISettings && <div>UI Settings</div>}
+          </div>
+        )}
         <table>
           <tbody className="cursor-pointer">
             {settings.instance.getBoard().map((row, y) => (
