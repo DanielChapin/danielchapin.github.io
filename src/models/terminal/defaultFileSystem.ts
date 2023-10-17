@@ -41,7 +41,10 @@ const defaultFileSystem = (): TerminalDirectory => {
   );
 
   const gamesDir = new TerminalDirectory("games", null, [
-    new TerminalTextFile("minesweeper.script", "redirect /games/minesweeper"),
+    new TerminalTextFile(
+      "minesweeper.script",
+      "# Minesweeper\nredirect /games/minesweeper"
+    ),
   ]);
 
   const root = new TerminalDirectory("", null, [
