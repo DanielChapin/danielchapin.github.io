@@ -6,6 +6,7 @@ import Minesweeper, {
 } from "@models/games/minesweeper/minesweeper";
 import { useState, useEffect, ReactNode } from "react";
 import { Coord2D } from "util/Coord2D";
+import SettingsWindow from "./SettingsWindow";
 
 const MinesweeperElement = () => {
   type InstanceSettings = {
@@ -46,9 +47,24 @@ const MinesweeperElement = () => {
     console.log("Change in game settings.");
   }, [settings.game.width, settings.game.height, settings.game.mines]);
 
+  const getTextColor = (adjacentBombs: number): string => {
+    if (Math.min(8, Math.max(1, adjacentBombs)) !== adjacentBombs) return "";
+
+    return [
+      "text-sky-600",
+      "text-green-600",
+      "text-red-500",
+      "text-blue-800",
+      "text-red-800",
+      "text-teal-500",
+      "text-black",
+      "text-slate-800",
+    ][adjacentBombs - 1];
+  };
+
   return (
-    <div>
-      <div className="flex flex-row">
+    <div className="px-3">
+      <div className="flex flex-row py-2">
         <button
           className="text-4xl"
           onClick={() => {
@@ -79,8 +95,12 @@ const MinesweeperElement = () => {
       </div>
       <div>
         {(settings.showGameSettings || settings.showUISettings) && (
-          <div className="absolute flex flex-row">
-            {settings.showGameSettings && <div>Game Settings</div>}
+          <div className="absolute flex flex-row p-1">
+            {settings.showGameSettings && (
+              <SettingsWindow name="Game Settings">
+                Very cool game settings
+              </SettingsWindow>
+            )}
             {settings.showUISettings && <div>UI Settings</div>}
           </div>
         )}
@@ -126,7 +146,13 @@ const MinesweeperElement = () => {
                         if (tile.selectionState == null) return <p></p>;
 
                         if (tile.adjacentBombs !== 0)
-                          return <p>{tile.adjacentBombs}</p>;
+                          return (
+                            <b
+                              className={`${getTextColor(tile.adjacentBombs)}`}
+                            >
+                              {tile.adjacentBombs}
+                            </b>
+                          );
 
                         return <p></p>;
                       })()}
