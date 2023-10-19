@@ -36,6 +36,7 @@ enum Difficulty {
   Hard,
   Custom,
 }
+
 const difficultySettings: (_: Difficulty) => MinesweeperSettings = (
   diff: Difficulty
 ) => {
@@ -50,6 +51,25 @@ const difficultySettings: (_: Difficulty) => MinesweeperSettings = (
       return { width: 30, height: 20, mines: 145 };
   }
 };
+
+type DifficultyInfo = {
+  difficulty: Difficulty;
+  name: string;
+  settings: MinesweeperSettings;
+};
+
+const getDifficultyInfos = (): Array<DifficultyInfo> => {
+  return Object.values(Difficulty)
+    .filter((entry) => typeof entry === "number")
+    .map((value) => ({
+      difficulty: value as Difficulty,
+      name: Difficulty[value as number],
+      settings: difficultySettings(value as Difficulty),
+    }));
+};
+
+const difficulties: Array<DifficultyInfo> = getDifficultyInfos();
+const defaultDifficulty: Difficulty = Difficulty.Easy;
 
 class Minesweeper {
   width: number;
@@ -210,5 +230,11 @@ class Minesweeper {
 }
 
 export default Minesweeper;
-export { Difficulty, difficultySettings, SelectionType };
+export {
+  Difficulty,
+  difficultySettings,
+  SelectionType,
+  difficulties,
+  defaultDifficulty,
+};
 export type { MinesweeperSettings, Tile };

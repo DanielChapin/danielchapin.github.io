@@ -12,7 +12,7 @@ const SettingsWindow = ({
   onClose,
 }: Props): ReactElement => {
   return (
-    <div className="flex flex-col border border-black">
+    <div className="h-min border border-black">
       <div className="bg-slate-500 w-full flex flex-row justify-between px-1">
         <p>{name}</p>
         <button onClick={() => onClose?.()}>X</button>
