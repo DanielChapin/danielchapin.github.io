@@ -44,7 +44,7 @@ const MinesweeperElement = () => {
     const maxMines = custom.width * custom.height - 9;
     custom.mines = Math.max(0, Math.min(maxMines, custom.mines));
 
-    updateState({ customSettings: custom });
+    updateState({ difficulty: Difficulty.Custom, customSettings: custom });
   };
 
   const tileClicked = (
@@ -131,6 +131,7 @@ const MinesweeperElement = () => {
                             type="radio"
                             id={name}
                             name="difficulty"
+                            checked={difficulty === state.difficulty}
                             onChange={() => {
                               console.log("Updating difficulty!");
                               updateState({ difficulty: difficulty });
@@ -191,6 +192,7 @@ const MinesweeperElement = () => {
                   </tbody>
                 </table>
                 <button
+                  className="m-0.5 px-1 bg-sky-300 rounded-full border border-black"
                   onClick={() =>
                     updateState({
                       showGameSettings: false,
