@@ -8,7 +8,8 @@ import MinesweeperPage from "pages/games/MinesweeperPage";
 const router = createHashRouter([
   {
     path: "/",
-    element: <PortfolioPage />,
+    // element: <PortfolioPage />,
+    element: <TerminalPage />,
   },
   {
     path: "/terminal",

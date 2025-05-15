@@ -32,7 +32,8 @@ class TerminalInstance {
     this.lines =
       "Daniel Chapin Portfolio Terminal\n" +
       "(Type 'help')\n" +
-      "(If keystokes aren't registering you may need to click on the page.)\n";
+      "(If keystokes aren't registering you may need to click on the page.)\n" +
+      "(type 'run intro.script')\n";
     this.input = "";
 
     this.setWorkingDirectory(this.root);
